@@ -48,10 +48,9 @@ func Up() {
 	{
 		authRepo := auth.NewUserRepo(postgreRepo)
 		authService := auth.NewService(authRepo)
-		authHandler := auth.NewHandler(authService)
+		authHandler := auth.NewHandler(authService, log.WithFields(log.Fields{"service": "AuthUser"}))
 		authHandler.GroupHandler(app)
 
-		//log.Fatal(app.Listen(":8080"))
 		log.Infof("http server listening %v:%v", envCfg.APIHost, envCfg.APIPort)
 		log.WithFields(log.Fields{
 			"action": "app.Listen",

@@ -2,15 +2,16 @@ package auth
 
 import (
 	"github.com/gofiber/fiber/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 type Handler struct {
 	service *Service
-	//Logger  *log.Entry
+	Logger  *log.Entry
 }
 
-func NewHandler(service *Service) *Handler {
-	return &Handler{service}
+func NewHandler(service *Service, logger *log.Entry) *Handler {
+	return &Handler{service, logger}
 }
 func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/auth")
@@ -22,9 +23,9 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 
 	payload := LoginRequest{}
 	if err := ctx.BodyParser(&payload); err != nil {
-		//h.Logger.WithFields(log.Fields{
-		//	"action": "ctx.BodyParser",
-		//}).Errorf("%v", err)
+		h.Logger.WithFields(log.Fields{
+			"action": "ctx.BodyParser",
+		}).Errorf("%v", err)
 		msgErr := ErrorResponse{Error: err.Error()}
 		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
 	}
@@ -41,9 +42,9 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 
 	payload := RegisterRequest{}
 	if err := ctx.BodyParser(&payload); err != nil {
-		//h.Logger.WithFields(log.Fields{
-		//	"action": "ctx.BodyParser",
-		//}).Errorf("%v", err)
+		h.Logger.WithFields(log.Fields{
+			"action": "ctx.BodyParser",
+		}).Errorf("%v", err)
 		msgErr := ErrorResponse{Error: err.Error()}
 		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
 	}
