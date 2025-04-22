@@ -17,6 +17,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/auth")
 	group.Post("/login", h.Login)
 	group.Post("/register", h.Register)
+	group.Get("/protected", h.Protected)
 }
 
 func (h *Handler) Login(ctx *fiber.Ctx) error {
@@ -54,4 +55,8 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendStatus(fiber.StatusCreated)
+}
+
+func (h *Handler) Protected(ctx *fiber.Ctx) error {
+	return ctx.JSON(fiber.Map{"message": "authorized user"})
 }
