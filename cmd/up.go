@@ -8,6 +8,7 @@ import (
 	"github.com/mellgit/shorturl/internal/auth"
 	"github.com/mellgit/shorturl/internal/config"
 	dbInit "github.com/mellgit/shorturl/internal/db"
+	"github.com/mellgit/shorturl/internal/shortener"
 	"github.com/mellgit/shorturl/pkg/logger"
 	log "github.com/sirupsen/logrus"
 )
@@ -50,6 +51,11 @@ func Up() {
 		authService := auth.NewService(authRepo)
 		authHandler := auth.NewHandler(authService, log.WithFields(log.Fields{"service": "AuthUser"}))
 		authHandler.GroupHandler(app)
+
+		shortenerRepo := shortener.NewRepo(postgreRepo)
+		shortenerService := shortener.NewService(shortenerRepo)
+		shortenerHandler := shortener.NewHandler(shortenerService, log.WithFields(log.Fields{"service": "Shortener"}))
+		shortenerHandler.GroupHandler(app)
 
 		log.Infof("http server listening %v:%v", envCfg.APIHost, envCfg.APIPort)
 		log.WithFields(log.Fields{
