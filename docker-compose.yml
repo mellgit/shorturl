@@ -48,3 +48,12 @@ services:
       options:
         max-file: "5"
         max-size: "10m"
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
