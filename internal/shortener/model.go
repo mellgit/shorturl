@@ -13,8 +13,8 @@ type URL struct {
 
 type ShortenRequest struct {
 	URL      string `json:"url" validate:"required,url"`
-	Custom   string `json:"custom"`    // optional alias
-	TTLHours int    `json:"ttl_hours"` // optional ttl, default to 24
+	Custom   string `json:"custom"`                            // optional alias
+	TTLHours int    `json:"ttl_hours" validate:"gte=1,lte=72"` // optional ttl, default to 24
 }
 
 type ErrorResponse struct {
