@@ -19,6 +19,7 @@ func NewHandler(service *Service, logger *log.Entry) *Handler {
 func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/api", middleware.JWTProtected())
 	group.Post("/shorten", h.ShortenHandler)
+	group.Get("/protected", h.Protected)
 }
 
 func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
@@ -48,4 +49,8 @@ func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 		"short_url":  ctx.BaseURL() + "/s/" + result.Alias,
 		"expires_at": result.ExpiresAt,
 	})
+}
+
+func (h *Handler) Protected(ctx *fiber.Ctx) error {
+	return ctx.JSON(fiber.Map{"message": "authorized user"})
 }
