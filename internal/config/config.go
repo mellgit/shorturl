@@ -22,8 +22,6 @@ type EnvConfig struct {
 	APIHost string `env:"API_HOST" envDefault:"localhost"`
 	APIPort int    `env:"API_PORT" envDefault:"3000"`
 
-	DBType string `env:"DB_TYPE" envDefault:"postgres"`
-
 	DBHost     string `env:"POSTGRES_HOST" envDefault:"localhost"`
 	DBPort     int    `env:"POSTGRES_PORT" envDefault:"5432"`
 	DBUser     string `env:"POSTGRES_USER" envDefault:"postgres"`
@@ -32,6 +30,10 @@ type EnvConfig struct {
 
 	MigrationsPath string `env:"POSTGRES_MIGRATIONS_PATH" envDefault:"./migrations"`
 	MigrationsDSN  string `env:"POSTGRES_MIGRATIONS_DSN" envDefault:"host=$(DB_HOST) port=$(DB_PORT) dbname=$(DB_NAME) user=$(DB_USER) password=$(DB_PASSWORD) sslmode=disable"`
+
+	RedisHost string `env:"REDIS_HOST" envDefault:"localhost"`
+	RedisPort int    `env:"REDIS_PORT" envDefault:"6379"`
+	RedisDB   int    `env:"REDIS_DB" envDefault:"0"`
 }
 
 // LoadConfig reads configuration from yml file

@@ -46,8 +46,8 @@ i:
 b:
 	docker build -t someuser .
 cleardb:
-	rm -r ./mongo_data ./postgres_data
-r: down up
+	rm -r ./redis_data ./postgres_data
+r: down cleardb up
 cn:
 	docker rmi $(docker images -q --filter="dangling=true") # clear images with none status
 

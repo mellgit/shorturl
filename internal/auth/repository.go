@@ -2,7 +2,7 @@ package auth
 
 import "database/sql"
 
-type UserRepository interface {
+type Repository interface {
 	FindByEmail(email string) (*User, error)
 	Create(user *User) error
 }
@@ -11,7 +11,7 @@ type PostgresUserRepo struct {
 	db *sql.DB
 }
 
-func NewUserRepo(db *sql.DB) *PostgresUserRepo {
+func NewRepo(db *sql.DB) *PostgresUserRepo {
 	return &PostgresUserRepo{db}
 }
 

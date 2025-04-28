@@ -40,28 +40,28 @@ func Up() {
 	log.Debugf("config: %+v", cfg)
 	log.Debugf("env: %+v", envCfg)
 
-	postgresRepo, err := dbInit.NewPostgresRepository(*envCfg)
+	postgresClient, err := dbInit.PostgresClient(*envCfg)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"action": "db.NewPostgresRepository",
+			"action": "dbInit.PostgresClient",
 		}).Fatal(err)
 	}
-	rdb := dbInit.NewClient()
+	redisClient := dbInit.RedisClient(*envCfg)
 
 	app := fiber.New()
 	{
-		authRepo := auth.NewUserRepo(postgresRepo)
+		authRepo := auth.NewRepo(postgresClient)
 		authService := auth.NewService(authRepo)
 		authHandler := auth.NewHandler(authService, log.WithFields(log.Fields{"service": "AuthUser"}))
 		authHandler.GroupHandler(app)
 
-		shortenerRepo := shortener.NewRepo(postgresRepo)
+		shortenerRepo := shortener.NewRepo(postgresClient)
 		shortenerService := shortener.NewService(shortenerRepo)
 		shortenerHandler := shortener.NewHandler(shortenerService, log.WithFields(log.Fields{"service": "Shortener"}))
 		shortenerHandler.GroupHandler(app)
 
-		redirectRepo := redirect.NewRepo(postgresRepo)
-		redirectService := redirect.NewService(redirectRepo, rdb)
+		redirectRepo := redirect.NewRepo(postgresClient)
+		redirectService := redirect.NewService(redirectRepo, redisClient)
 		redirectHandler := redirect.NewHandler(redirectService, log.WithFields(log.Fields{"service": "Redirect"}))
 		redirectHandler.GroupHandler(app)
 

@@ -2,7 +2,8 @@ package db
 
 import (
 	"context"
-	"os"
+	"fmt"
+	"github.com/mellgit/shorturl/internal/config"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -10,11 +11,11 @@ import (
 
 var Ctx = context.Background()
 
-func NewClient() *redis.Client {
+func RedisClient(envCfg config.EnvConfig) *redis.Client {
 	return redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_ADDR"), // "localhost:6379"
-		Password: "",                      // or use os.Getenv("REDIS_PASS")
-		DB:       0,
+		Addr:     fmt.Sprintf("%v:%v", envCfg.RedisHost, envCfg.RedisPort),
+		Password: "",
+		DB:       envCfg.RedisDB,
 	})
 }
 

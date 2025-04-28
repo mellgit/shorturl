@@ -8,7 +8,7 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-func NewPostgresRepository(envCfg config.EnvConfig) (*sql.DB, error) {
+func PostgresClient(envCfg config.EnvConfig) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%v port=%v dbname=%v user=%v password=%v sslmode=disable",
 		envCfg.DBHost, envCfg.DBPort, envCfg.DBName, envCfg.DBUser, envCfg.DBPassword,
