@@ -9,15 +9,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service struct {
+type Service interface {
+	Register(email, password string) error
+	Login(email, password string) (string, error)
+}
+type AuthService struct {
 	repo Repository
 }
 
-func NewService(repo Repository) *Service {
-	return &Service{repo}
+func NewService(repo Repository) Service {
+	return &AuthService{repo}
 }
 
-func (s *Service) Register(email, password string) error {
+func (s *AuthService) Register(email, password string) error {
 	_, err := s.repo.FindByEmail(email)
 	if err == nil {
 		return errors.New("user already exists")
@@ -35,7 +39,7 @@ func (s *Service) Register(email, password string) error {
 	return s.repo.Create(&user)
 }
 
-func (s *Service) Login(email, password string) (string, error) {
+func (s *AuthService) Login(email, password string) (string, error) {
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {
 		return "", errors.New("invalid credentials")

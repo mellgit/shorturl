@@ -9,16 +9,19 @@ import (
 	goredis "github.com/redis/go-redis/v9"
 )
 
-type Service struct {
+type Service interface {
+	ResolveAndTrack(alias, ip, userAgent string) (string, error)
+}
+type RedirectService struct {
 	repo Repository
 	rdb  *goredis.Client
 }
 
-func NewService(repo Repository, rdb *goredis.Client) *Service {
-	return &Service{repo: repo, rdb: rdb}
+func NewService(repo Repository, rdb *goredis.Client) Service {
+	return &RedirectService{repo: repo, rdb: rdb}
 }
 
-func (s *Service) ResolveAndTrack(alias, ip, userAgent string) (string, error) {
+func (s *RedirectService) ResolveAndTrack(alias, ip, userAgent string) (string, error) {
 	// 1. Check Redis
 	cached, err := redisDB.Get(s.rdb, "short:"+alias)
 	if err == nil {
