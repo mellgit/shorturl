@@ -10,11 +10,11 @@ import (
 )
 
 type Service struct {
-	repo RedirectRepository
+	repo Repository
 	rdb  *goredis.Client
 }
 
-func NewService(repo RedirectRepository, rdb *goredis.Client) *Service {
+func NewService(repo Repository, rdb *goredis.Client) *Service {
 	return &Service{repo: repo, rdb: rdb}
 }
 

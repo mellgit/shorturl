@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type RedirectRepository interface {
+type Repository interface {
 	FindOriginalByAlias(alias string) (string, time.Time, error)
 	SaveClick(c *Click) error
 }
@@ -13,7 +13,7 @@ type PostgresRedirectRepo struct {
 	db *sql.DB
 }
 
-func NewRepo(db *sql.DB) *PostgresRedirectRepo {
+func NewRepo(db *sql.DB) Repository {
 	return &PostgresRedirectRepo{db}
 }
 
