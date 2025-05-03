@@ -10,6 +10,7 @@ import (
 	dbInit "github.com/mellgit/shorturl/internal/db"
 	"github.com/mellgit/shorturl/internal/redirect"
 	"github.com/mellgit/shorturl/internal/shortener"
+	"github.com/mellgit/shorturl/internal/users"
 	"github.com/mellgit/shorturl/pkg/logger"
 	log "github.com/sirupsen/logrus"
 )
@@ -64,6 +65,11 @@ func Up() {
 		redirectService := redirect.NewService(redirectRepo, redisClient)
 		redirectHandler := redirect.NewHandler(redirectService, log.WithFields(log.Fields{"service": "Redirect"}))
 		redirectHandler.GroupHandler(app)
+
+		usersRepo := users.NewRepo(postgresClient)
+		usersService := users.NewService(usersRepo)
+		userHandler := users.NewHandler(usersService, log.WithFields(log.Fields{"service": "Users"}))
+		userHandler.GroupHandler(app)
 
 		log.Infof("http server listening %v:%v", envCfg.APIHost, envCfg.APIPort)
 		log.WithFields(log.Fields{
