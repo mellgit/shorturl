@@ -14,7 +14,7 @@ type PostgresRepo struct {
 	db *sql.DB
 }
 
-func NewRepo(db *sql.DB) *PostgresRepo {
+func NewRepo(db *sql.DB) Repository {
 	return &PostgresRepo{db}
 }
 

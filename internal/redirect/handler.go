@@ -7,11 +7,11 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	service Service
 	Logger  *log.Entry
 }
 
-func NewHandler(service *Service, logger *log.Entry) *Handler {
+func NewHandler(service Service, logger *log.Entry) *Handler {
 	return &Handler{service, logger}
 }
 
@@ -26,7 +26,6 @@ func (h *Handler) RedirectHandler(ctx *fiber.Ctx) error {
 	alias := ctx.Params("alias")
 	ip := ctx.IP()
 	ua := ctx.Get("User-Agent")
-	h.Logger.Info(alias, ip, ua)
 
 	original, err := h.service.ResolveAndTrack(alias, ip, ua)
 	if err != nil {

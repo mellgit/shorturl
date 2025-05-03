@@ -8,11 +8,11 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	service Service
 	Logger  *log.Entry
 }
 
-func NewHandler(service *Service, logger *log.Entry) *Handler {
+func NewHandler(service Service, logger *log.Entry) *Handler {
 	return &Handler{service, logger}
 }
 

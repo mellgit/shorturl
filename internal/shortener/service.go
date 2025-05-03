@@ -10,15 +10,18 @@ import (
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 const aliasLength = 6
 
-type Service struct {
+type Service interface {
+	CreateShortURL(userID int64, original, customAlias string, ttlHours int) (*URL, error)
+}
+type ShortenerService struct {
 	repo Repository
 }
 
-func NewService(repo Repository) *Service {
-	return &Service{repo}
+func NewService(repo Repository) Service {
+	return &ShortenerService{repo}
 }
 
-func (s *Service) CreateShortURL(userID int64, original, customAlias string, ttlHours int) (*URL, error) {
+func (s *ShortenerService) CreateShortURL(userID int64, original, customAlias string, ttlHours int) (*URL, error) {
 	var alias string
 
 	// custom alias
