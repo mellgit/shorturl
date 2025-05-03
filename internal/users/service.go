@@ -2,6 +2,7 @@ package users
 
 type Service interface {
 	ListUsers() (*[]UserResponse, error)
+	GetUserByID(id int64) (*UserResponse, error)
 	//GetUserByID()
 	//DeleteUserByID()
 	//UpdateUserByID()
@@ -22,4 +23,12 @@ func (s *UserService) ListUsers() (*[]UserResponse, error) {
 	}
 	return listUsers, nil
 
+}
+
+func (s *UserService) GetUserByID(id int64) (*UserResponse, error) {
+	user, err := s.repo.GetUserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
