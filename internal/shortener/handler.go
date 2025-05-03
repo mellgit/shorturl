@@ -20,6 +20,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/api", middleware.JWTProtected())
 	group.Post("/shorten", h.ShortenHandler)
 	group.Get("/protected", h.Protected)
+	group.Get("/stats/:alias", h.Stats)
 }
 
 func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
@@ -53,4 +54,17 @@ func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 
 func (h *Handler) Protected(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{"message": "authorized user"})
+}
+
+func (h *Handler) Stats(ctx *fiber.Ctx) error {
+
+	alias := ctx.Params("alias")
+	count, err := h.service.Stats(alias)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.JSON(fiber.Map{
+		"count": count,
+	})
+
 }

@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	Save(url *URL) error
 	IsAliasTaken(alias string) (bool, error)
+	Stats(alias string) (int, error)
 }
 
 type PostgresRepo struct {
@@ -36,4 +37,21 @@ func (r *PostgresRepo) IsAliasTaken(alias string) (bool, error) {
 		return false, err
 	}
 	return exists, nil
+}
+
+func (r *PostgresRepo) Stats(alias string) (int, error) {
+	query := `select count(*) from clicks where alias=$1;`
+	rows, err := r.db.Query(query, alias)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+	var count int
+	for rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return 0, err
+		}
+	}
+	return count, nil
+
 }
