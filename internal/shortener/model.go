@@ -17,10 +17,23 @@ type ShortenRequest struct {
 	TTLHours int    `json:"ttl_hours" validate:"gte=1,lte=72"` // optional ttl, default to 24
 }
 
-type ErrorResponse struct {
-	Error string `json:"error"`
+type ShortenResponse struct {
+	ShortURL string    `json:"short_url"`
+	Expires  time.Time `json:"expires_at"`
 }
 
 type UpdateAliasRequest struct {
 	Alias string `json:"alias"`
+}
+
+type Count struct {
+	Count int `json:"count"`
+}
+
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+type MessageResponse struct {
+	Message string `json:"message"`
 }

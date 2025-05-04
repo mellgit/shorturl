@@ -33,10 +33,14 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 
 	token, err := h.service.Login(payload.Email, payload.Password)
 	if err != nil {
-		return fiber.NewError(fiber.StatusUnauthorized, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "Login",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
 	}
 
-	return ctx.JSON(fiber.Map{"token": token})
+	return ctx.Status(fiber.StatusOK).JSON(Token{Token: token})
 
 }
 func (h *Handler) Register(ctx *fiber.Ctx) error {
@@ -51,7 +55,11 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 	}
 
 	if err := h.service.Register(payload.Email, payload.Password); err != nil {
-		return fiber.NewError(fiber.StatusServiceUnavailable, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "Register",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
 	}
 
 	return ctx.SendStatus(fiber.StatusCreated)
