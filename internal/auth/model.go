@@ -16,6 +16,10 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
+type Token struct {
+	Token string `json:"token"`
+}
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }

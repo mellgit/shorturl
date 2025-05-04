@@ -16,7 +16,6 @@ func NewHandler(service Service, logger *log.Entry) *Handler {
 }
 
 func (h *Handler) GroupHandler(app *fiber.App) {
-
 	group := app.Group("/api", middleware.JWTProtected())
 	group.Get("/s/:alias", h.RedirectHandler)
 }
@@ -29,9 +28,13 @@ func (h *Handler) RedirectHandler(ctx *fiber.Ctx) error {
 
 	original, err := h.service.ResolveAndTrack(alias, ip, ua)
 	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "ResolveAndTrack",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
 	}
 
 	//return ctx.Redirect(original, fiber.StatusFound)
-	return ctx.JSON(fiber.Map{"original": original})
+	return ctx.Status(fiber.StatusOK).JSON(Original{Original: original})
 }

@@ -60,7 +60,7 @@ func (s *ShortenerService) CreateShortURL(userID int64, original, customAlias st
 	}
 
 	err := s.repo.Save(url)
-	return url, fmt.Errorf("error creating url: %w", err)
+	return url, err
 }
 
 func (s *ShortenerService) Stats(alias string) (int, error) {

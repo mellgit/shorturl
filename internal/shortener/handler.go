@@ -27,6 +27,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 }
 
 func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
+
 	payload := ShortenRequest{}
 	if err := ctx.BodyParser(&payload); err != nil {
 		h.Logger.WithFields(log.Fields{
@@ -46,17 +47,22 @@ func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 
 	result, err := h.service.CreateShortURL(userID, payload.URL, payload.Custom, payload.TTLHours)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "CreateShortURL",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
 	}
 
-	return ctx.JSON(fiber.Map{
-		"short_url":  ctx.BaseURL() + "/s/" + result.Alias,
-		"expires_at": result.ExpiresAt,
-	})
+	response := ShortenResponse{
+		ShortURL: ctx.BaseURL() + "/s/" + result.Alias,
+		Expires:  result.ExpiresAt,
+	}
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
 func (h *Handler) Protected(ctx *fiber.Ctx) error {
-	return ctx.JSON(fiber.Map{"message": "authorized user"})
+	return ctx.Status(fiber.StatusOK).JSON(MessageResponse{Message: "authorized user"})
 }
 
 func (h *Handler) Stats(ctx *fiber.Ctx) error {
@@ -64,19 +70,24 @@ func (h *Handler) Stats(ctx *fiber.Ctx) error {
 	alias := ctx.Params("alias")
 	count, err := h.service.Stats(alias)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "Stats",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
-	return ctx.JSON(fiber.Map{
-		"count": count,
-	})
-
+	return ctx.Status(fiber.StatusOK).JSON(Count{Count: count})
 }
 
 func (h *Handler) List(ctx *fiber.Ctx) error {
 
 	urls, err := h.service.List()
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "List",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
 	return ctx.Status(fiber.StatusOK).JSON(urls)
 }
@@ -85,11 +96,13 @@ func (h *Handler) DeleteUrl(ctx *fiber.Ctx) error {
 
 	alias := ctx.Params("alias")
 	if err := h.service.Delete(alias); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "DeleteUrl",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "shortened url deleted",
-	})
+	return ctx.Status(fiber.StatusOK).JSON(MessageResponse{Message: "url deleted"})
 }
 
 func (h *Handler) UpdateAlias(ctx *fiber.Ctx) error {
@@ -97,13 +110,19 @@ func (h *Handler) UpdateAlias(ctx *fiber.Ctx) error {
 	alias := ctx.Params("alias")
 	payload := UpdateAliasRequest{}
 	if err := ctx.BodyParser(&payload); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "ctx.BodyParser",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
 	}
 
 	if err := h.service.UpdateAlias(alias, payload.Alias); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		h.Logger.WithFields(log.Fields{
+			"action": "UpdateAlias",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "shortened url updated",
-	})
+	return ctx.Status(fiber.StatusOK).JSON(MessageResponse{Message: "url updated"})
 }
