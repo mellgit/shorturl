@@ -4,7 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/mellgit/shorturl/docs"
 	"github.com/mellgit/shorturl/internal/auth"
 	"github.com/mellgit/shorturl/internal/config"
 	dbInit "github.com/mellgit/shorturl/internal/db"
@@ -14,6 +16,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Up
+// @title Short URL
+// @version 1.0
+// @host localhost:3000
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func Up() {
 	cfgPath := flag.String("config", "config.yml", "config file path")
 	flag.Parse()
@@ -64,6 +73,8 @@ func Up() {
 		redirectService := redirect.NewService(redirectRepo, redisClient)
 		redirectHandler := redirect.NewHandler(redirectService, log.WithFields(log.Fields{"service": "Redirect"}))
 		redirectHandler.GroupHandler(app)
+
+		app.Get("/swagger/*", swagger.HandlerDefault)
 
 		log.Infof("http server listening %v:%v", envCfg.APIHost, envCfg.APIPort)
 		log.WithFields(log.Fields{
