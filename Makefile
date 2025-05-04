@@ -17,7 +17,7 @@ generate-proto:
 	GOBIN=$(LOCAL_BIN) protoc --proto_path=$(PATH_PROTO) \
 	--go_out=$(PATH_PROTO) --go_opt=paths=source_relative \
 	--go-grpc_out=$(PATH_PROTO) --go-grpc_opt=paths=source_relative \
-	$(PATH_PROTO)/someuser.proto
+	$(PATH_PROTO)/shorturl.proto
 
 migration-status:
 	$(LOCAL_BIN)/goose -dir $(POSTGRES_MIGRATIONS_PATH) postgres $(POSTGRES_MIGRATIONS_DSN) status -v
@@ -44,7 +44,7 @@ down:
 i:
 	docker images
 b:
-	docker build -t someuser .
+	docker build -t shorturl .
 cleardb:
 	rm -r ./redis_data ./postgres_data
 r: down cleardb up
@@ -52,9 +52,9 @@ cn:
 	docker rmi $(docker images -q --filter="dangling=true") # clear images with none status
 
 
-lu:
-	docker logs -f --tail 100 someuser
-eu:
-	docker exec -it someuser sh
+ls:
+	docker logs -f --tail 100 shorturl
+es:
+	docker exec -it shorturl sh
 er:
 	docker exec -it redis redis-cli
