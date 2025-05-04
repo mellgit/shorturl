@@ -11,6 +11,7 @@ type Repository interface {
 	IsAliasTaken(alias string) (bool, error)
 	Stats(alias string) (int, error)
 	List() (*[]URL, error)
+	Delete(alias string) error
 }
 
 type PostgresRepo struct {
@@ -77,4 +78,15 @@ func (r *PostgresRepo) List() (*[]URL, error) {
 	}
 	return &urls, nil
 
+}
+
+func (r *PostgresRepo) Delete(alias string) error {
+
+	ctx := context.Background()
+	query := `delete from urls where alias=$1;`
+	_, err := r.db.ExecContext(ctx, query, alias)
+	if err != nil {
+		return err
+	}
+	return nil
 }

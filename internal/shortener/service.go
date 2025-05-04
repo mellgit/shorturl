@@ -14,6 +14,7 @@ type Service interface {
 	CreateShortURL(userID int64, original, customAlias string, ttlHours int) (*URL, error)
 	Stats(alias string) (int, error)
 	List() (*[]URL, error)
+	Delete(alias string) error
 }
 type ShortenerService struct {
 	repo Repository
@@ -84,4 +85,8 @@ func generateRandomString(n int) string {
 		sb.WriteByte(charset[rand.Intn(len(charset))])
 	}
 	return sb.String()
+}
+
+func (s *ShortenerService) Delete(alias string) error {
+	return s.repo.Delete(alias)
 }

@@ -20,6 +20,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/api", middleware.JWTProtected())
 	group.Post("/shorten", h.ShortenHandler)
 	group.Get("/shorten/list", h.List)
+	group.Delete("/shorten/:alias", h.DeleteUrl)
 	group.Get("/protected", h.Protected)
 	group.Get("/stats/:alias", h.Stats)
 }
@@ -77,4 +78,15 @@ func (h *Handler) List(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	return ctx.Status(fiber.StatusOK).JSON(urls)
+}
+
+func (h *Handler) DeleteUrl(ctx *fiber.Ctx) error {
+
+	alias := ctx.Params("alias")
+	if err := h.service.Delete(alias); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "shortened url deleted",
+	})
 }
