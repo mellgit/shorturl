@@ -1,6 +1,6 @@
 # short url
 
-short url - это сервис, который сокращает ссылки
+short url - this is a service that shortens links.
 
 ## Table of Contents
 - [Docker Installation](#Docker)
