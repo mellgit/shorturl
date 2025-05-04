@@ -1,29 +1,30 @@
 version: "3.8"
 
 services:
-#  shorturl:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    container_name: shorturl
-#    volumes:
-#      - /etc/timezone:/etc/timezone:ro
-#      - /etc/localtime:/etc/localtime:ro
-#      - ./config.yml:/home/app/config.yml:ro
-#      - ./.env:/home/app/.env:ro
-#    depends_on:
-#      - postgres
-#    ports:
-#      - "3000:3000"
-#    env_file:
-#      - .env
-#    restart: "always"
-#    command: [ "./shorturl", "-config", "/home/app/config.yml" ]
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-file: "5"
-#        max-size: "10m"
+  shorturl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shorturl
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./config.yml:/home/app/config.yml:ro
+      - ./.env:/home/app/.env:ro
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: "always"
+    command: [ "./shorturl", "-config", "/home/app/config.yml" ]
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
 
   postgres:
     image: postgres:17.2-bullseye
