@@ -21,6 +21,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group.Post("/shorten", h.ShortenHandler)
 	group.Get("/shorten/list", h.List)
 	group.Delete("/shorten/:alias", h.DeleteUrl)
+	group.Patch("/shorten/:alias", h.UpdateAlias)
 	group.Get("/protected", h.Protected)
 	group.Get("/stats/:alias", h.Stats)
 }
@@ -88,5 +89,21 @@ func (h *Handler) DeleteUrl(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "shortened url deleted",
+	})
+}
+
+func (h *Handler) UpdateAlias(ctx *fiber.Ctx) error {
+
+	alias := ctx.Params("alias")
+	payload := UpdateAliasRequest{}
+	if err := ctx.BodyParser(&payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	if err := h.service.UpdateAlias(alias, payload.Alias); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "shortened url updated",
 	})
 }

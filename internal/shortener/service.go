@@ -15,6 +15,7 @@ type Service interface {
 	Stats(alias string) (int, error)
 	List() (*[]URL, error)
 	Delete(alias string) error
+	UpdateAlias(alias, newAlias string) error
 }
 type ShortenerService struct {
 	repo Repository
@@ -89,4 +90,8 @@ func generateRandomString(n int) string {
 
 func (s *ShortenerService) Delete(alias string) error {
 	return s.repo.Delete(alias)
+}
+
+func (s *ShortenerService) UpdateAlias(alias, newAlias string) error {
+	return s.repo.UpdateAlias(alias, newAlias)
 }

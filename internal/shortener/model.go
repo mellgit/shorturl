@@ -20,3 +20,7 @@ type ShortenRequest struct {
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
+
+type UpdateAliasRequest struct {
+	Alias string `json:"alias"`
+}
