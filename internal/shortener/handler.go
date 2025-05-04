@@ -19,7 +19,11 @@ func NewHandler(service Service, logger *log.Entry) *Handler {
 func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/api", middleware.JWTProtected())
 	group.Post("/shorten", h.ShortenHandler)
+	group.Get("/shorten/list", h.List)
+	group.Delete("/shorten/:alias", h.DeleteUrl)
+	group.Patch("/shorten/:alias", h.UpdateAlias)
 	group.Get("/protected", h.Protected)
+	group.Get("/stats/:alias", h.Stats)
 }
 
 func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
@@ -53,4 +57,53 @@ func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 
 func (h *Handler) Protected(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{"message": "authorized user"})
+}
+
+func (h *Handler) Stats(ctx *fiber.Ctx) error {
+
+	alias := ctx.Params("alias")
+	count, err := h.service.Stats(alias)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.JSON(fiber.Map{
+		"count": count,
+	})
+
+}
+
+func (h *Handler) List(ctx *fiber.Ctx) error {
+
+	urls, err := h.service.List()
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.Status(fiber.StatusOK).JSON(urls)
+}
+
+func (h *Handler) DeleteUrl(ctx *fiber.Ctx) error {
+
+	alias := ctx.Params("alias")
+	if err := h.service.Delete(alias); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "shortened url deleted",
+	})
+}
+
+func (h *Handler) UpdateAlias(ctx *fiber.Ctx) error {
+
+	alias := ctx.Params("alias")
+	payload := UpdateAliasRequest{}
+	if err := ctx.BodyParser(&payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	if err := h.service.UpdateAlias(alias, payload.Alias); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "shortened url updated",
+	})
 }
