@@ -1,7 +1,7 @@
 package redirect
 
 import (
-	"errors"
+	"fmt"
 	"time"
 
 	redisDB "github.com/mellgit/shorturl/internal/db"
@@ -32,11 +32,11 @@ func (s *RedirectService) ResolveAndTrack(alias, ip, userAgent string) (string, 
 	// 2. Fallback to Postgres
 	original, expiresAt, err := s.repo.FindOriginalByAlias(alias)
 	if err != nil {
-		return "", errors.New("link not found")
+		return "", fmt.Errorf("failed to find original url for alias %s: %w", alias, err)
 	}
 
 	if time.Now().After(expiresAt) {
-		return "", errors.New("link expired")
+		return "", fmt.Errorf("link expired %s: %w", alias, err)
 	}
 
 	// 3. Save to Redis

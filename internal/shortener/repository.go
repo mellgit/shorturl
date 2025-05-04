@@ -3,6 +3,7 @@ package shortener
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -38,7 +39,7 @@ func (r *PostgresRepo) IsAliasTaken(alias string) (bool, error) {
 	var exists bool
 	err := r.db.QueryRow("SELECT EXISTS (SELECT 1 FROM urls WHERE alias=$1)", alias).Scan(&exists)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("error checking if alias exists: %w", err)
 	}
 	return exists, nil
 }
@@ -47,13 +48,13 @@ func (r *PostgresRepo) Stats(alias string) (int, error) {
 	query := `select count(*) from clicks where alias=$1;`
 	rows, err := r.db.Query(query, alias)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("error getting clicks stats: %w", err)
 	}
 	defer rows.Close()
 	var count int
 	for rows.Next() {
 		if err := rows.Scan(&count); err != nil {
-			return 0, err
+			return 0, fmt.Errorf("error scanning row: %w", err)
 		}
 	}
 	return count, nil
@@ -65,14 +66,14 @@ func (r *PostgresRepo) List() (*[]URL, error) {
 	query := `select * from urls;`
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error listing urls: %w", err)
 	}
 	defer rows.Close()
 	var urls []URL
 	for rows.Next() {
 		var u URL
 		if err := rows.Scan(&u.ID, &u.UserID, &u.Original, &u.Alias, &u.ExpiresAt, &u.CreatedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error scanning row: %w", err)
 		}
 		urls = append(urls, u)
 
@@ -87,7 +88,7 @@ func (r *PostgresRepo) Delete(alias string) error {
 	query := `delete from urls where alias=$1;`
 	_, err := r.db.ExecContext(ctx, query, alias)
 	if err != nil {
-		return err
+		return fmt.Errorf("error deleting url: %w", err)
 	}
 	return nil
 }
@@ -97,7 +98,7 @@ func (r *PostgresRepo) UpdateAlias(alias, newAlias string) error {
 	query := `update urls set alias=$1 where alias=$2;`
 	_, err := r.db.ExecContext(ctx, query, newAlias, alias)
 	if err != nil {
-		return err
+		return fmt.Errorf("error updating alias: %w", err)
 	}
 	return nil
 }

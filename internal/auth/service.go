@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"errors"
+	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"os"
 	"time"
@@ -24,12 +24,12 @@ func NewService(repo Repository) Service {
 func (s *AuthService) Register(email, password string) error {
 	_, err := s.repo.FindByEmail(email)
 	if err == nil {
-		return errors.New("user already exists")
+		return fmt.Errorf("email already registered")
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not hash password: %w", err)
 	}
 
 	user := User{
@@ -42,12 +42,12 @@ func (s *AuthService) Register(email, password string) error {
 func (s *AuthService) Login(email, password string) (string, error) {
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {
-		return "", errors.New("invalid credentials")
+		return "", fmt.Errorf("could not find user by email: %w", err)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "", errors.New("invalid credentials")
+		return "", fmt.Errorf("could not compare password: %w", err)
 	}
 
 	claims := jwt.MapClaims{
@@ -60,7 +60,7 @@ func (s *AuthService) Login(email, password string) (string, error) {
 
 	signedToken, err := token.SignedString([]byte(secret))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("could not sign token: %w", err)
 	}
 
 	return signedToken, nil

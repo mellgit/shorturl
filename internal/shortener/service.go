@@ -1,7 +1,7 @@
 package shortener
 
 import (
-	"errors"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -32,10 +32,10 @@ func (s *ShortenerService) CreateShortURL(userID int64, original, customAlias st
 	if customAlias != "" {
 		exists, err := s.repo.IsAliasTaken(customAlias)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error checking if alias exists: %w", err)
 		}
 		if exists {
-			return nil, errors.New("alias already taken")
+			return nil, fmt.Errorf("custom alias is already used")
 		}
 		alias = customAlias
 	} else {
@@ -60,13 +60,13 @@ func (s *ShortenerService) CreateShortURL(userID int64, original, customAlias st
 	}
 
 	err := s.repo.Save(url)
-	return url, err
+	return url, fmt.Errorf("error creating url: %w", err)
 }
 
 func (s *ShortenerService) Stats(alias string) (int, error) {
 	count, err := s.repo.Stats(alias)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("error getting stats: %w", err)
 	}
 	return count, nil
 }
@@ -74,9 +74,17 @@ func (s *ShortenerService) Stats(alias string) (int, error) {
 func (s *ShortenerService) List() (*[]URL, error) {
 	urls, err := s.repo.List()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error listing urls: %w", err)
 	}
 	return urls, nil
+}
+
+func (s *ShortenerService) Delete(alias string) error {
+	return s.repo.Delete(alias)
+}
+
+func (s *ShortenerService) UpdateAlias(alias, newAlias string) error {
+	return s.repo.UpdateAlias(alias, newAlias)
 }
 
 func generateRandomString(n int) string {
@@ -86,12 +94,4 @@ func generateRandomString(n int) string {
 		sb.WriteByte(charset[rand.Intn(len(charset))])
 	}
 	return sb.String()
-}
-
-func (s *ShortenerService) Delete(alias string) error {
-	return s.repo.Delete(alias)
-}
-
-func (s *ShortenerService) UpdateAlias(alias, newAlias string) error {
-	return s.repo.UpdateAlias(alias, newAlias)
 }
