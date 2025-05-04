@@ -20,6 +20,19 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group.Get("/s/:alias", h.RedirectHandler)
 }
 
+// RedirectHandler
+// @Summary      RedirectHandler
+// @Description  RedirectHandler get token
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Param        alias path string true "alias"
+// @Success      200 {object} Original
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/s/{alias} [get]
 func (h *Handler) RedirectHandler(ctx *fiber.Ctx) error {
 
 	alias := ctx.Params("alias")
@@ -32,7 +45,7 @@ func (h *Handler) RedirectHandler(ctx *fiber.Ctx) error {
 			"action": "ResolveAndTrack",
 		}).Errorf("%v", err)
 		msgErr := ErrorResponse{Error: err.Error()}
-		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
 
 	//return ctx.Redirect(original, fiber.StatusFound)

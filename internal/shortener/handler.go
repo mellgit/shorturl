@@ -26,6 +26,19 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group.Get("/stats/:alias", h.Stats)
 }
 
+// ShortenHandler
+// @Summary      ShortenHandler
+// @Description  ShortenHandler create alias
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Param 		 request body ShortenRequest true "body"
+// @Success      200 {object} ShortenResponse
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/shorten [post]
 func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 
 	payload := ShortenRequest{}
@@ -61,10 +74,36 @@ func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
+// Protected
+// @Summary      Protected
+// @Description  Protected check authorized user
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} MessageResponse
+// @Failure      400 {object} ErrorResponse
+// @Failure      401 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/protected [get]
 func (h *Handler) Protected(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(MessageResponse{Message: "authorized user"})
 }
 
+// Stats
+// @Summary      Stats
+// @Description  Stats for clicks on url
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Param        alias path string true "alias"
+// @Success      200 {object} Count
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/stats/{alias} [get]
 func (h *Handler) Stats(ctx *fiber.Ctx) error {
 
 	alias := ctx.Params("alias")
@@ -79,6 +118,18 @@ func (h *Handler) Stats(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(Count{Count: count})
 }
 
+// List
+// @Summary      List
+// @Description  List
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Success      200 {array} URL
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/shorten/list [get]
 func (h *Handler) List(ctx *fiber.Ctx) error {
 
 	urls, err := h.service.List()
@@ -92,6 +143,19 @@ func (h *Handler) List(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(urls)
 }
 
+// DeleteUrl
+// @Summary      DeleteUrl
+// @Description  DeleteUrl
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Param        alias path string true "alias"
+// @Success      200 {object} MessageResponse
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/shorten/{alias} [delete]
 func (h *Handler) DeleteUrl(ctx *fiber.Ctx) error {
 
 	alias := ctx.Params("alias")
@@ -105,6 +169,20 @@ func (h *Handler) DeleteUrl(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(MessageResponse{Message: "url deleted"})
 }
 
+// UpdateAlias
+// @Summary      UpdateAlias
+// @Description  UpdateAlias update only alias
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Param        alias path string true "alias"
+// @Param 		 request body UpdateAliasRequest true "body"
+// @Success      200 {object} MessageResponse
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/shorten/{alias} [patch]
 func (h *Handler) UpdateAlias(ctx *fiber.Ctx) error {
 
 	alias := ctx.Params("alias")

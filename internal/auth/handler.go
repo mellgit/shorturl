@@ -20,6 +20,18 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group.Post("/register", h.Register)
 }
 
+// Login
+// @Summary      Login
+// @Description  Login user
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Param 		 request body LoginRequest true "body"
+// @Success      200 {object} Token
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /auth/login [post]
 func (h *Handler) Login(ctx *fiber.Ctx) error {
 
 	payload := LoginRequest{}
@@ -37,12 +49,24 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 			"action": "Login",
 		}).Errorf("%v", err)
 		msgErr := ErrorResponse{Error: err.Error()}
-		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(Token{Token: token})
-
 }
+
+// Register
+// @Summary      Register
+// @Description  Register new user
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      json
+// @Param 		 request body RegisterRequest true "body"
+// @Success      204 {object} int
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /auth/register/ [post]
 func (h *Handler) Register(ctx *fiber.Ctx) error {
 
 	payload := RegisterRequest{}
@@ -59,7 +83,7 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 			"action": "Register",
 		}).Errorf("%v", err)
 		msgErr := ErrorResponse{Error: err.Error()}
-		return ctx.Status(fiber.StatusBadRequest).JSON(msgErr)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
 
 	return ctx.SendStatus(fiber.StatusCreated)
