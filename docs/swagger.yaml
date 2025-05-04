@@ -1,0 +1,425 @@
+definitions:
+  auth.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.Token:
+    properties:
+      token:
+        type: string
+    type: object
+  redirect.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  redirect.Original:
+    properties:
+      original:
+        type: string
+    type: object
+  shortener.Count:
+    properties:
+      count:
+        type: integer
+    type: object
+  shortener.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  shortener.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  shortener.ShortenRequest:
+    properties:
+      custom:
+        description: optional alias
+        type: string
+      ttl_hours:
+        description: optional ttl, default to 24
+        maximum: 72
+        minimum: 1
+        type: integer
+      url:
+        type: string
+    required:
+    - url
+    type: object
+  shortener.ShortenResponse:
+    properties:
+      expires_at:
+        type: string
+      short_url:
+        type: string
+    type: object
+  shortener.URL:
+    properties:
+      alias:
+        type: string
+      created_at:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: integer
+      original:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  shortener.UpdateAliasRequest:
+    properties:
+      alias:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  title: Short URL
+  version: "1.0"
+paths:
+  /api/protected:
+    get:
+      consumes:
+      - application/json
+      description: Protected check authorized user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shortener.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Protected
+      tags:
+      - ShortUrl
+  /api/s/{alias}:
+    get:
+      consumes:
+      - application/json
+      description: RedirectHandler get token
+      parameters:
+      - description: alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/redirect.Original'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/redirect.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/redirect.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/redirect.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: RedirectHandler
+      tags:
+      - ShortUrl
+  /api/shorten:
+    post:
+      consumes:
+      - application/json
+      description: ShortenHandler create alias
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/shortener.ShortenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shortener.ShortenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: ShortenHandler
+      tags:
+      - ShortUrl
+  /api/shorten/{alias}:
+    delete:
+      consumes:
+      - application/json
+      description: DeleteUrl
+      parameters:
+      - description: alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shortener.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: DeleteUrl
+      tags:
+      - ShortUrl
+    patch:
+      consumes:
+      - application/json
+      description: UpdateAlias update only alias
+      parameters:
+      - description: alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/shortener.UpdateAliasRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shortener.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: UpdateAlias
+      tags:
+      - ShortUrl
+  /api/shorten/list:
+    get:
+      consumes:
+      - application/json
+      description: List
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/shortener.URL'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List
+      tags:
+      - ShortUrl
+  /api/stats/{alias}:
+    get:
+      consumes:
+      - application/json
+      description: Stats for clicks on url
+      parameters:
+      - description: alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shortener.Count'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Stats
+      tags:
+      - ShortUrl
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Login
+      tags:
+      - ShortUrl
+  /auth/register/:
+    post:
+      consumes:
+      - application/json
+      description: Register new user
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Register
+      tags:
+      - ShortUrl
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
