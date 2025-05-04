@@ -1,6 +1,7 @@
 package shortener
 
 import (
+	"context"
 	"database/sql"
 	"time"
 )
@@ -9,6 +10,7 @@ type Repository interface {
 	Save(url *URL) error
 	IsAliasTaken(alias string) (bool, error)
 	Stats(alias string) (int, error)
+	List() (*[]URL, error)
 }
 
 type PostgresRepo struct {
@@ -53,5 +55,26 @@ func (r *PostgresRepo) Stats(alias string) (int, error) {
 		}
 	}
 	return count, nil
+
+}
+
+func (r *PostgresRepo) List() (*[]URL, error) {
+	ctx := context.Background()
+	query := `select * from urls;`
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var urls []URL
+	for rows.Next() {
+		var u URL
+		if err := rows.Scan(&u.ID, &u.UserID, &u.Original, &u.Alias, &u.ExpiresAt, &u.CreatedAt); err != nil {
+			return nil, err
+		}
+		urls = append(urls, u)
+
+	}
+	return &urls, nil
 
 }

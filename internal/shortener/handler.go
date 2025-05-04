@@ -19,6 +19,7 @@ func NewHandler(service Service, logger *log.Entry) *Handler {
 func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/api", middleware.JWTProtected())
 	group.Post("/shorten", h.ShortenHandler)
+	group.Get("/shorten/list", h.List)
 	group.Get("/protected", h.Protected)
 	group.Get("/stats/:alias", h.Stats)
 }
@@ -67,4 +68,13 @@ func (h *Handler) Stats(ctx *fiber.Ctx) error {
 		"count": count,
 	})
 
+}
+
+func (h *Handler) List(ctx *fiber.Ctx) error {
+
+	urls, err := h.service.List()
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return ctx.Status(fiber.StatusOK).JSON(urls)
 }

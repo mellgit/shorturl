@@ -13,6 +13,7 @@ const aliasLength = 6
 type Service interface {
 	CreateShortURL(userID int64, original, customAlias string, ttlHours int) (*URL, error)
 	Stats(alias string) (int, error)
+	List() (*[]URL, error)
 }
 type ShortenerService struct {
 	repo Repository
@@ -66,6 +67,14 @@ func (s *ShortenerService) Stats(alias string) (int, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (s *ShortenerService) List() (*[]URL, error) {
+	urls, err := s.repo.List()
+	if err != nil {
+		return nil, err
+	}
+	return urls, nil
 }
 
 func generateRandomString(n int) string {
