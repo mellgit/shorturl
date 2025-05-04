@@ -1,6 +1,9 @@
 package auth
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 type Repository interface {
 	FindByEmail(email string) (*User, error)
@@ -20,7 +23,7 @@ func (r *PostgresUserRepo) FindByEmail(email string) (*User, error) {
 	user := &User{}
 	err := row.Scan(&user.ID, &user.Email, &user.Password)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not find user by email: %w", err)
 	}
 	return user, nil
 }
