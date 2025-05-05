@@ -2,6 +2,7 @@ package shortener
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/skip2/go-qrcode"
 	"math/rand"
 	"strings"
@@ -12,7 +13,7 @@ const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 const aliasLength = 6
 
 type Service interface {
-	CreateShortURL(userID int64, original, customAlias string, ttlHours int) (*URL, error)
+	CreateShortURL(userID uuid.UUID, original, customAlias string, ttlHours int) (*URL, error)
 	Stats(alias string) (int, error)
 	List() (*[]URL, error)
 	Delete(alias string) error
@@ -27,7 +28,7 @@ func NewService(repo Repository) Service {
 	return &ShortenerService{repo}
 }
 
-func (s *ShortenerService) CreateShortURL(userID int64, original, customAlias string, ttlHours int) (*URL, error) {
+func (s *ShortenerService) CreateShortURL(userID uuid.UUID, original, customAlias string, ttlHours int) (*URL, error) {
 	var alias string
 
 	// custom alias

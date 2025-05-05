@@ -1,10 +1,13 @@
 package shortener
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type URL struct {
-	ID        int64     `json:"id"`
-	UserID    int64     `json:"user_id"`
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
 	Original  string    `json:"original"`
 	Alias     string    `json:"alias"`
 	ExpiresAt time.Time `json:"expires_at"`

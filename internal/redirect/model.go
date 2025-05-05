@@ -1,9 +1,12 @@
 package redirect
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Click struct {
-	ID        int64     `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Alias     string    `json:"alias"`
 	IP        string    `json:"ip"`
 	UserAgent string    `json:"user_agent"`

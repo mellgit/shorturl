@@ -1,10 +1,11 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    primary key(id)
 );
 
 -- +goose StatementEnd
