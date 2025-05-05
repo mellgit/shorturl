@@ -20,6 +20,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 	group := app.Group("/api", middleware.JWTProtected())
 	group.Post("/shorten", h.ShortenHandler)
 	group.Get("/shorten/list", h.List)
+	group.Get("/shorten/qrcode/:alias", h.GenerateQRCode)
 	group.Delete("/shorten/:alias", h.DeleteUrl)
 	group.Patch("/shorten/:alias", h.UpdateAlias)
 	group.Get("/protected", h.Protected)
@@ -203,4 +204,32 @@ func (h *Handler) UpdateAlias(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
 	}
 	return ctx.Status(fiber.StatusOK).JSON(MessageResponse{Message: "url updated"})
+}
+
+// GenerateQRCode
+// @Summary      GenerateQRCode
+// @Description  GenerateQRCode
+// @Security ApiKeyAuth
+// @Tags         ShortUrl
+// @Accept       json
+// @Produce      png
+// @Param        alias path string true "alias"
+// @Success      200 {object} []byte
+// @Failure      400 {object} ErrorResponse
+// @Failure      404 {object} ErrorResponse
+// @Failure      500 {object} ErrorResponse
+// @Router       /api/shorten/qrcode/{alias} [get]
+func (h *Handler) GenerateQRCode(ctx *fiber.Ctx) error {
+
+	alias := ctx.Params("alias")
+	qrCode, err := h.service.GenerateQRCode(alias)
+	if err != nil {
+		h.Logger.WithFields(log.Fields{
+			"action": "GenerateQRCode",
+		}).Errorf("%v", err)
+		msgErr := ErrorResponse{Error: err.Error()}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(msgErr)
+	}
+	ctx.Set("Content-Type", "image/png")
+	return ctx.Status(fiber.StatusOK).Send(qrCode)
 }

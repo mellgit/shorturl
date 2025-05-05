@@ -14,6 +14,7 @@ type Repository interface {
 	List() (*[]URL, error)
 	Delete(alias string) error
 	UpdateAlias(alias, newAlias string) error
+	GetUrlFromAlias(alias string) (string, error)
 }
 
 type PostgresRepo struct {
@@ -101,4 +102,15 @@ func (r *PostgresRepo) UpdateAlias(alias, newAlias string) error {
 		return fmt.Errorf("error updating alias: %w", err)
 	}
 	return nil
+}
+
+func (r *PostgresRepo) GetUrlFromAlias(alias string) (string, error) {
+	ctx := context.Background()
+	query := `select original from urls where alias=$1;`
+	row := r.db.QueryRowContext(ctx, query, alias)
+	var original string
+	if err := row.Scan(&original); err != nil {
+		return "", fmt.Errorf("error scanning row: %w", err)
+	}
+	return original, nil
 }

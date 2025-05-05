@@ -314,6 +314,43 @@ paths:
       summary: List
       tags:
       - ShortUrl
+  /api/shorten/qrcode/{alias}:
+    get:
+      consumes:
+      - application/json
+      description: GenerateQRCode
+      parameters:
+      - description: alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shortener.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: GenerateQRCode
+      tags:
+      - ShortUrl
   /api/stats/{alias}:
     get:
       consumes:

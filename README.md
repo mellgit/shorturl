@@ -32,6 +32,7 @@ What can I do?:
 - delete an alias
 - update the alias
 - get statistics on the number of clicks on a link
+- get a generated QR code using an alias
 
 
 ## <a name="Stack"></a> Stack
@@ -43,6 +44,7 @@ Backend
 - **goose:** migrations
 - **JWT**
 - **swagger**
+- **qrcode**
 
 Data Base
 - **PostgreSQL**
