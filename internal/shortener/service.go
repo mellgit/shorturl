@@ -2,6 +2,7 @@ package shortener
 
 import (
 	"fmt"
+	"github.com/skip2/go-qrcode"
 	"math/rand"
 	"strings"
 	"time"
@@ -16,6 +17,7 @@ type Service interface {
 	List() (*[]URL, error)
 	Delete(alias string) error
 	UpdateAlias(alias, newAlias string) error
+	GenerateQRCode(alias string) ([]byte, error)
 }
 type ShortenerService struct {
 	repo Repository
@@ -85,6 +87,18 @@ func (s *ShortenerService) Delete(alias string) error {
 
 func (s *ShortenerService) UpdateAlias(alias, newAlias string) error {
 	return s.repo.UpdateAlias(alias, newAlias)
+}
+
+func (s *ShortenerService) GenerateQRCode(alias string) ([]byte, error) {
+	url, err := s.repo.GetUrlFromAlias(alias)
+	if err != nil {
+		return nil, fmt.Errorf("error getting url from alias: %w", err)
+	}
+	qrCode, err := qrcode.Encode(url, qrcode.Medium, 256) // hardcode size for qr code
+	if err != nil {
+		return nil, fmt.Errorf("could not generate a QR code: %v", err)
+	}
+	return qrCode, nil
 }
 
 func generateRandomString(n int) string {
