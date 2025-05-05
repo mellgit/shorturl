@@ -1,9 +1,11 @@
 package auth
 
+import "github.com/google/uuid"
+
 type User struct {
-	ID       int64  `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"-"` // Храним в зашифрованном виде
+	ID       uuid.UUID `json:"id"`
+	Email    string    `json:"email"`
+	Password string    `json:"-"` // Храним в зашифрованном виде
 }
 
 type RegisterRequest struct {
