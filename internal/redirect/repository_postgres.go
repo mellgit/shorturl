@@ -5,19 +5,19 @@ import (
 	"time"
 )
 
-type Repository interface {
+type PostgresRepository interface {
 	FindOriginalByAlias(alias string) (string, time.Time, error)
 	SaveClick(c *Click) error
 }
-type PostgresRedirectRepo struct {
+type postgresRepository struct {
 	db *sql.DB
 }
 
-func NewRepo(db *sql.DB) Repository {
-	return &PostgresRedirectRepo{db}
+func NewPostgresRepo(db *sql.DB) PostgresRepository {
+	return &postgresRepository{db}
 }
 
-func (r *PostgresRedirectRepo) FindOriginalByAlias(alias string) (string, time.Time, error) {
+func (r *postgresRepository) FindOriginalByAlias(alias string) (string, time.Time, error) {
 	var original string
 	var expiresAt time.Time
 	err := r.db.QueryRow(
@@ -26,7 +26,7 @@ func (r *PostgresRedirectRepo) FindOriginalByAlias(alias string) (string, time.T
 	return original, expiresAt, err
 }
 
-func (r *PostgresRedirectRepo) SaveClick(c *Click) error {
+func (r *postgresRepository) SaveClick(c *Click) error {
 	_, err := r.db.Exec(
 		"INSERT INTO clicks (alias, ip, user_agent, created_at) VALUES ($1, $2, $3, $4)",
 		c.Alias, c.IP, c.UserAgent, time.Now(),
