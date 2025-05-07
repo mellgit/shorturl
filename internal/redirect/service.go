@@ -3,34 +3,30 @@ package redirect
 import (
 	"fmt"
 	"time"
-
-	redisDB "github.com/mellgit/shorturl/internal/db"
-
-	goredis "github.com/redis/go-redis/v9"
 )
 
 type Service interface {
 	ResolveAndTrack(alias, ip, userAgent string) (string, error)
 }
 type RedirectService struct {
-	repo Repository
-	rdb  *goredis.Client
+	postgresRepo PostgresRepository
+	redisRepo    RedisRepository
 }
 
-func NewService(repo Repository, rdb *goredis.Client) Service {
-	return &RedirectService{repo: repo, rdb: rdb}
+func NewService(postgresRepo PostgresRepository, redisRepo RedisRepository) Service {
+	return &RedirectService{postgresRepo: postgresRepo, redisRepo: redisRepo}
 }
 
 func (s *RedirectService) ResolveAndTrack(alias, ip, userAgent string) (string, error) {
 	// 1. Check Redis
-	cached, err := redisDB.Get(s.rdb, "short:"+alias)
+	cached, err := s.redisRepo.Get("short:" + alias)
 	if err == nil {
-		go s.repo.SaveClick(&Click{Alias: alias, IP: ip, UserAgent: userAgent})
+		go s.postgresRepo.SaveClick(&Click{Alias: alias, IP: ip, UserAgent: userAgent})
 		return cached, nil
 	}
 
 	// 2. Fallback to Postgres
-	original, expiresAt, err := s.repo.FindOriginalByAlias(alias)
+	original, expiresAt, err := s.postgresRepo.FindOriginalByAlias(alias)
 	if err != nil {
 		return "", fmt.Errorf("failed to find original url for alias %s: %w", alias, err)
 	}
@@ -41,10 +37,10 @@ func (s *RedirectService) ResolveAndTrack(alias, ip, userAgent string) (string, 
 
 	// 3. Save to Redis
 	ttl := time.Until(expiresAt)
-	_ = redisDB.SetWithTTL(s.rdb, "short:"+alias, original, ttl)
+	_ = s.redisRepo.SetWithTTL("short:"+alias, original, ttl)
 
 	// 4. Track click
-	go s.repo.SaveClick(&Click{Alias: alias, IP: ip, UserAgent: userAgent})
+	go s.postgresRepo.SaveClick(&Click{Alias: alias, IP: ip, UserAgent: userAgent})
 
 	return original, nil
 }
