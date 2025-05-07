@@ -69,8 +69,9 @@ func Up() {
 		shortenerHandler := shortener.NewHandler(shortenerService, log.WithFields(log.Fields{"service": "Shortener"}))
 		shortenerHandler.GroupHandler(app)
 
-		redirectRepo := redirect.NewRepo(postgresClient)
-		redirectService := redirect.NewService(redirectRepo, redisClient)
+		redirectPostgresRepo := redirect.NewPostgresRepo(postgresClient)
+		redirectRedisRepo := redirect.NewRedisRepo(redisClient)
+		redirectService := redirect.NewService(redirectPostgresRepo, redirectRedisRepo)
 		redirectHandler := redirect.NewHandler(redirectService, log.WithFields(log.Fields{"service": "Redirect"}))
 		redirectHandler.GroupHandler(app)
 
