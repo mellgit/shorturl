@@ -15,6 +15,7 @@ type Service interface {
 	Register(email, password string) error
 	Login(email, password string) (*TokensResponse, error)
 	RefreshToken(refreshToken string) (*AccessTokenResponse, error)
+	Logout(token string) error
 }
 type AuthService struct {
 	repo Repository
@@ -159,4 +160,16 @@ func (s *AuthService) parseToken(tokenStr string, isRefresh bool) (*jwt.Token, e
 		return nil, err
 	}
 	return token, nil
+}
+
+func (s *AuthService) Logout(tokenStr string) error {
+
+	user, err := s.repo.FindByToken(tokenStr)
+	if err != nil {
+		return fmt.Errorf("could not find user by token: %w", err)
+	}
+	if err := s.repo.DeleteRefreshToken(user); err != nil {
+		return fmt.Errorf("could not delete refresh token: %w", err)
+	}
+	return nil
 }
