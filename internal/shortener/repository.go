@@ -18,11 +18,12 @@ type Repository interface {
 }
 
 type PostgresRepo struct {
-	db *sql.DB
+	db  *sql.DB
+	ctx context.Context
 }
 
 func NewRepo(db *sql.DB) Repository {
-	return &PostgresRepo{db}
+	return &PostgresRepo{ctx: context.Background(), db: db}
 }
 
 func (r *PostgresRepo) Save(u *URL) error {
@@ -59,13 +60,11 @@ func (r *PostgresRepo) Stats(alias string) (int, error) {
 		}
 	}
 	return count, nil
-
 }
 
 func (r *PostgresRepo) List() (*[]URL, error) {
-	ctx := context.Background()
 	query := `select * from urls;`
-	rows, err := r.db.QueryContext(ctx, query)
+	rows, err := r.db.QueryContext(r.ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("error listing urls: %w", err)
 	}
@@ -77,17 +76,13 @@ func (r *PostgresRepo) List() (*[]URL, error) {
 			return nil, fmt.Errorf("error scanning row: %w", err)
 		}
 		urls = append(urls, u)
-
 	}
 	return &urls, nil
-
 }
 
 func (r *PostgresRepo) Delete(alias string) error {
-
-	ctx := context.Background()
 	query := `delete from urls where alias=$1;`
-	_, err := r.db.ExecContext(ctx, query, alias)
+	_, err := r.db.ExecContext(r.ctx, query, alias)
 	if err != nil {
 		return fmt.Errorf("error deleting url: %w", err)
 	}
@@ -95,9 +90,8 @@ func (r *PostgresRepo) Delete(alias string) error {
 }
 
 func (r *PostgresRepo) UpdateAlias(alias, newAlias string) error {
-	ctx := context.Background()
 	query := `update urls set alias=$1 where alias=$2;`
-	_, err := r.db.ExecContext(ctx, query, newAlias, alias)
+	_, err := r.db.ExecContext(r.ctx, query, newAlias, alias)
 	if err != nil {
 		return fmt.Errorf("error updating alias: %w", err)
 	}
@@ -105,9 +99,8 @@ func (r *PostgresRepo) UpdateAlias(alias, newAlias string) error {
 }
 
 func (r *PostgresRepo) GetUrlFromAlias(alias string) (string, error) {
-	ctx := context.Background()
 	query := `select original from urls where alias=$1;`
-	row := r.db.QueryRowContext(ctx, query, alias)
+	row := r.db.QueryRowContext(r.ctx, query, alias)
 	var original string
 	if err := row.Scan(&original); err != nil {
 		return "", fmt.Errorf("error scanning row: %w", err)

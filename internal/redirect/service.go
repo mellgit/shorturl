@@ -18,14 +18,14 @@ func NewService(postgresRepo PostgresRepository, redisRepo RedisRepository) Serv
 }
 
 func (s *RedirectService) ResolveAndTrack(alias, ip, userAgent string) (string, error) {
-	// 1. Check Redis
+	// check Redis
 	cached, err := s.redisRepo.Get("short:" + alias)
 	if err == nil {
 		go s.postgresRepo.SaveClick(&Click{Alias: alias, IP: ip, UserAgent: userAgent})
 		return cached, nil
 	}
 
-	// 2. Fallback to Postgres
+	// fallback to Postgres
 	original, expiresAt, err := s.postgresRepo.FindOriginalByAlias(alias)
 	if err != nil {
 		return "", fmt.Errorf("failed to find original url for alias %s: %w", alias, err)
@@ -35,11 +35,11 @@ func (s *RedirectService) ResolveAndTrack(alias, ip, userAgent string) (string, 
 		return "", fmt.Errorf("link expired %s: %w", alias, err)
 	}
 
-	// 3. Save to Redis
+	// save to Redis
 	ttl := time.Until(expiresAt)
 	_ = s.redisRepo.SetWithTTL("short:"+alias, original, ttl)
 
-	// 4. Track click
+	// track click
 	go s.postgresRepo.SaveClick(&Click{Alias: alias, IP: ip, UserAgent: userAgent})
 
 	return original, nil
