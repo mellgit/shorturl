@@ -1,19 +1,52 @@
 package middleware
 
 import (
-	"os"
-
+	"errors"
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v3"
+	"github.com/golang-jwt/jwt/v4"
+	"os"
+	"strings"
 )
 
 func JWTProtected() fiber.Handler {
-	return jwtware.New(jwtware.Config{
-		SigningKey:   []byte(os.Getenv("JWT_SECRET")),
-		ErrorHandler: jwtError,
-	})
+	return func(c *fiber.Ctx) error {
+		tokenStr := c.Get("Authorization")
+		if tokenStr == "" {
+			return c.Status(fiber.StatusUnauthorized).SendString("Missing token")
+		}
+
+		token, err := parseToken(tokenStr, false)
+		if err != nil || !token.Valid {
+			return c.Status(fiber.StatusUnauthorized).SendString("Invalid token")
+		}
+
+		claims := token.Claims.(jwt.MapClaims)
+		c.Locals("user_id", claims["user_id"].(string))
+
+		return c.Next()
+	}
 }
 
-func jwtError(c *fiber.Ctx, err error) error {
-	return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized: "+err.Error())
+func parseToken(tokenStr string, isRefresh bool) (*jwt.Token, error) {
+	secret := os.Getenv("ACCESS_KEY") // secret token
+	if isRefresh {
+		secret = os.Getenv("REFRESH_KEY")
+	}
+
+	// delete Bearer prefix before transferring the token to jwt.Parse
+	parts := strings.Split(tokenStr, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return nil, errors.New("invalid token")
+	}
+
+	// get jwt without prefix
+	tokenStr = parts[1]
+
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
 }
