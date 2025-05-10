@@ -20,6 +20,14 @@ definitions:
     - email
     - password
     type: object
+  auth.LogoutRequest:
+    properties:
+      refresh_token:
+        minLength: 6
+        type: string
+    required:
+    - refresh_token
+    type: object
   auth.RefreshTokenRequest:
     properties:
       refresh_token:
@@ -433,6 +441,40 @@ paths:
           schema:
             $ref: '#/definitions/auth.ErrorResponse'
       summary: Login
+      tags:
+      - ShortUrl
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Logout
       tags:
       - ShortUrl
   /auth/refresh:
