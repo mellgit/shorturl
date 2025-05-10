@@ -18,8 +18,15 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
-type Token struct {
-	Token string `json:"token"`
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" validate:"required,min=6"`
+}
+type AccessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
+type TokensResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type ErrorResponse struct {
