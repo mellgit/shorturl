@@ -18,6 +18,10 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
+type LogoutRequest struct {
+	RefreshToken string `json:"refresh_token" validate:"required,min=6"`
+}
+
 type RefreshTokenRequest struct {
 	RefreshToken string `json:"refresh_token" validate:"required,min=6"`
 }
