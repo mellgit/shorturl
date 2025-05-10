@@ -12,6 +12,7 @@ type Repository interface {
 	SaveRefreshToken(user *User, refreshToken string) error
 	DeleteRefreshToken(user *User) error
 	CheckRefreshToken(userID, refreshToken string) error
+	FindByToken(token string) (*User, error)
 }
 
 type PostgresUserRepo struct {
@@ -75,4 +76,16 @@ func (r *PostgresUserRepo) CheckRefreshToken(userID string, refreshToken string)
 		return fmt.Errorf("refresh token does not exist")
 	}
 	return nil
+}
+
+func (r *PostgresUserRepo) FindByToken(token string) (*User, error) {
+
+	query := `SELECT id, email, password FROM users WHERE token=$1`
+	row := r.db.QueryRow(query, token)
+	user := &User{}
+	err := row.Scan(&user.ID, &user.Email, &user.Password)
+	if err != nil {
+		return nil, fmt.Errorf("could not find user by token: %w", err)
+	}
+	return user, nil
 }
