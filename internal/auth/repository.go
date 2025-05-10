@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 )
@@ -8,14 +9,21 @@ import (
 type Repository interface {
 	FindByEmail(email string) (*User, error)
 	Create(user *User) error
+	SaveRefreshToken(user *User, refreshToken string) error
+	DeleteRefreshToken(user *User) error
+	CheckRefreshToken(userID, refreshToken string) error
 }
 
 type PostgresUserRepo struct {
-	db *sql.DB
+	ctx context.Context
+	db  *sql.DB
 }
 
 func NewRepo(db *sql.DB) Repository {
-	return &PostgresUserRepo{db}
+	return &PostgresUserRepo{
+		ctx: context.Background(),
+		db:  db,
+	}
 }
 
 func (r *PostgresUserRepo) FindByEmail(email string) (*User, error) {
@@ -33,4 +41,38 @@ func (r *PostgresUserRepo) Create(user *User) error {
 		"INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id",
 		user.Email, user.Password,
 	).Scan(&user.ID)
+}
+
+func (r *PostgresUserRepo) SaveRefreshToken(user *User, refreshToken string) error {
+
+	query := `update users set token=$1, expires_at=NOW() + INTERVAL '7 days' where id=$2`
+	_, err := r.db.Exec(query, "Bearer "+refreshToken, user.ID)
+	if err != nil {
+		return fmt.Errorf("could not save refresh token: %w", err)
+	}
+	return nil
+}
+
+func (r *PostgresUserRepo) DeleteRefreshToken(user *User) error {
+
+	query := `update users set token=null where id=$1;`
+	_, err := r.db.Exec(query, user.ID)
+	if err != nil {
+		return fmt.Errorf("could not delete refresh token: %w", err)
+	}
+	return nil
+}
+
+func (r *PostgresUserRepo) CheckRefreshToken(userID string, refreshToken string) error {
+
+	var exists bool
+	query := `select exists(select 1 from users where id=$1 and token=$2 and expires_at > NOW())`
+	err := r.db.QueryRow(query, userID, refreshToken).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("could not check refresh token: %w", err)
+	}
+	if !exists {
+		return fmt.Errorf("refresh token does not exist")
+	}
+	return nil
 }
