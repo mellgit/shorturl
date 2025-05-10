@@ -1,4 +1,9 @@
 definitions:
+  auth.AccessTokenResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
   auth.ErrorResponse:
     properties:
       error:
@@ -15,6 +20,14 @@ definitions:
     - email
     - password
     type: object
+  auth.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        minLength: 6
+        type: string
+    required:
+    - refresh_token
+    type: object
   auth.RegisterRequest:
     properties:
       email:
@@ -26,9 +39,11 @@ definitions:
     - email
     - password
     type: object
-  auth.Token:
+  auth.TokensResponse:
     properties:
-      token:
+      access_token:
+        type: string
+      refresh_token:
         type: string
     type: object
   redirect.ErrorResponse:
@@ -87,11 +102,11 @@ definitions:
       expires_at:
         type: string
       id:
-        type: integer
+        type: string
       original:
         type: string
       user_id:
-        type: integer
+        type: string
     type: object
   shortener.UpdateAliasRequest:
     properties:
@@ -404,7 +419,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.Token'
+            $ref: '#/definitions/auth.TokensResponse'
         "400":
           description: Bad Request
           schema:
@@ -418,6 +433,40 @@ paths:
           schema:
             $ref: '#/definitions/auth.ErrorResponse'
       summary: Login
+      tags:
+      - ShortUrl
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: RefreshToken
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.AccessTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: RefreshToken
       tags:
       - ShortUrl
   /auth/register/:
