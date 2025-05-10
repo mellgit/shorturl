@@ -54,11 +54,11 @@ func (s *AuthService) Login(email, password string) (*TokensResponse, error) {
 		return nil, fmt.Errorf("could not compare password: %w", err)
 	}
 
-	accessToken, err := token.GenerateAccessToken(user.ID.String())
+	accessToken, err := token.GenerateToken(user.ID.String(), false)
 	if err != nil {
 		return nil, fmt.Errorf("could not generate access token: %w", err)
 	}
-	refreshToken, err := token.GenerateRefreshToken(user.ID.String())
+	refreshToken, err := token.GenerateToken(user.ID.String(), true)
 	if err != nil {
 		return nil, fmt.Errorf("could not generate refresh token: %w", err)
 	}
@@ -91,7 +91,7 @@ func (s *AuthService) RefreshToken(refreshToken string) (*AccessTokenResponse, e
 		return nil, fmt.Errorf("could not check refresh token: %w", err)
 	}
 
-	accessToken, err := token.GenerateAccessToken(userID)
+	accessToken, err := token.GenerateToken(userID, false)
 	if err != nil {
 		return nil, fmt.Errorf("could not generate access token: %w", err)
 	}

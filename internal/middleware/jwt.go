@@ -53,41 +53,26 @@ func ParseToken(tokenStr string, isRefresh bool) (*jwt.Token, error) {
 	return token, nil
 }
 
-func GenerateAccessToken(userID string) (string, error) {
+// GenerateToken - generate token. isRefresh false - access, isRefresh true - refresh
+func GenerateToken(userID string, isRefresh bool) (string, error) {
 
 	expirationTime := time.Now().Add(5 * time.Minute) // access token on 5 min
-	// generate access token
-	// data token
-	accClaims := jwt.MapClaims{
+	secretKey := os.Getenv("ACCESS_KEY")
+	if isRefresh {
+		expirationTime = time.Now().Add(7 * 24 * time.Hour) // refresh token on 1 week
+		secretKey = os.Getenv("REFRESH_KEY")
+	}
+	// data for token
+	claims := jwt.MapClaims{
 		"user_id": userID,
 		"exp":     expirationTime.Unix(),
 	}
-	accToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accClaims) // create new token (algorithm signing HMAC-SHA256)
-	accSecret := os.Getenv("ACCESS_KEY")                             // secret token
 
-	// use secret key for sing token
-	accessToken, err := accToken.SignedString([]byte(accSecret)) // header.payload.signature
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) // create new token (algorithm signing HMAC-SHA256)
+
+	signToken, err := token.SignedString([]byte(secretKey)) // header.payload.signature
 	if err != nil {
 		return "", fmt.Errorf("could not sign token: %w", err)
 	}
-	return accessToken, nil
-}
-
-func GenerateRefreshToken(userID string) (string, error) {
-
-	refreshExpiration := time.Now().Add(7 * 24 * time.Hour)
-	// generate refresh token
-	refClaims := jwt.MapClaims{
-		"user_id": userID,
-		"exp":     refreshExpiration.Unix(),
-	}
-
-	refToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refClaims)
-	refSecret := os.Getenv("REFRESH_KEY")
-
-	refreshToken, err := refToken.SignedString([]byte(refSecret))
-	if err != nil {
-		return "", fmt.Errorf("could not sign token: %w", err)
-	}
-	return refreshToken, nil
+	return signToken, nil
 }
