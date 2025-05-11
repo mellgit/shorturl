@@ -9,10 +9,10 @@ import (
 type Repository interface {
 	FindByEmail(email string) (*User, error)
 	Create(user *User) error
-	SaveRefreshToken(user *User, refreshToken string) error
-	DeleteRefreshToken(user *User) error
+	SaveRefreshToken(userID, refreshToken string) error
+	DeleteRefreshToken(userID string) error
 	CheckRefreshToken(userID, refreshToken string) error
-	FindByToken(token string) (*User, error)
+	FindByToken(token string) (string, error)
 }
 
 type PostgresUserRepo struct {
@@ -44,30 +44,30 @@ func (r *PostgresUserRepo) Create(user *User) error {
 	).Scan(&user.ID)
 }
 
-func (r *PostgresUserRepo) SaveRefreshToken(user *User, refreshToken string) error {
+func (r *PostgresUserRepo) SaveRefreshToken(userID, refreshToken string) error {
 
-	query := `update users set token=$1, expires_at=NOW() + INTERVAL '7 days' where id=$2`
-	_, err := r.db.Exec(query, "Bearer "+refreshToken, user.ID)
+	query := `insert into refresh_tokens (user_id, token, expires_at) values ($1, $2, NOW() + INTERVAL '7 days')`
+	_, err := r.db.Exec(query, userID, "Bearer "+refreshToken)
 	if err != nil {
 		return fmt.Errorf("could not save refresh token: %w", err)
 	}
 	return nil
 }
 
-func (r *PostgresUserRepo) DeleteRefreshToken(user *User) error {
+func (r *PostgresUserRepo) DeleteRefreshToken(userID string) error {
 
-	query := `update users set token=null where id=$1;`
-	_, err := r.db.Exec(query, user.ID)
+	query := `delete from refresh_tokens where user_id=$1`
+	_, err := r.db.Exec(query, userID)
 	if err != nil {
 		return fmt.Errorf("could not delete refresh token: %w", err)
 	}
 	return nil
 }
 
-func (r *PostgresUserRepo) CheckRefreshToken(userID string, refreshToken string) error {
+func (r *PostgresUserRepo) CheckRefreshToken(userID, refreshToken string) error {
 
 	var exists bool
-	query := `select exists(select 1 from users where id=$1 and token=$2 and expires_at > NOW())`
+	query := `select exists(select 1 from refresh_tokens where user_id=$1 and token=$2 and expires_at > NOW())`
 	err := r.db.QueryRow(query, userID, refreshToken).Scan(&exists)
 	if err != nil {
 		return fmt.Errorf("could not check refresh token: %w", err)
@@ -78,14 +78,14 @@ func (r *PostgresUserRepo) CheckRefreshToken(userID string, refreshToken string)
 	return nil
 }
 
-func (r *PostgresUserRepo) FindByToken(token string) (*User, error) {
+func (r *PostgresUserRepo) FindByToken(token string) (string, error) {
 
-	query := `SELECT id, email, password FROM users WHERE token=$1`
+	query := `select user_id from refresh_tokens where token=$1`
 	row := r.db.QueryRow(query, token)
-	user := &User{}
-	err := row.Scan(&user.ID, &user.Email, &user.Password)
+	var userID string
+	err := row.Scan(&userID)
 	if err != nil {
-		return nil, fmt.Errorf("could not find user by token: %w", err)
+		return "", fmt.Errorf("could not find user by token: %w", err)
 	}
-	return user, nil
+	return userID, nil
 }
