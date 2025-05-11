@@ -63,11 +63,11 @@ func (s *AuthService) Login(email, password string) (*TokensResponse, error) {
 		return nil, fmt.Errorf("could not generate refresh token: %w", err)
 	}
 
-	if err := s.repo.DeleteRefreshToken(user); err != nil {
+	if err := s.repo.DeleteRefreshToken(user.ID.String()); err != nil {
 		return nil, fmt.Errorf("could not delete refresh token: %w", err)
 	}
 
-	if err := s.repo.SaveRefreshToken(user, refreshToken); err != nil {
+	if err := s.repo.SaveRefreshToken(user.ID.String(), refreshToken); err != nil {
 		return nil, fmt.Errorf("could not save refresh token: %w", err)
 	}
 
@@ -101,11 +101,11 @@ func (s *AuthService) RefreshToken(refreshToken string) (*AccessTokenResponse, e
 
 func (s *AuthService) Logout(tokenStr string) error {
 
-	user, err := s.repo.FindByToken(tokenStr)
+	userID, err := s.repo.FindByToken(tokenStr)
 	if err != nil {
 		return fmt.Errorf("could not find user by token: %w", err)
 	}
-	if err := s.repo.DeleteRefreshToken(user); err != nil {
+	if err := s.repo.DeleteRefreshToken(userID); err != nil {
 		return fmt.Errorf("could not delete refresh token: %w", err)
 	}
 	return nil
