@@ -2,7 +2,6 @@ package shortener
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/mellgit/shorturl/internal/middleware"
 	log "github.com/sirupsen/logrus"
@@ -56,9 +55,7 @@ func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 		payload.TTLHours = 24
 	}
 
-	user := ctx.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	userID := claims["user_id"].(string) // jwt numbers → string
+	userID := ctx.Locals("user_id").(string)
 
 	result, err := h.service.CreateShortURL(uuid.MustParse(userID), payload.URL, payload.Custom, payload.TTLHours)
 	if err != nil {
