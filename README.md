@@ -32,7 +32,10 @@ The service implements JWT authentication with access and refresh tokens, with s
 
 Additionally:
 - if the refresh token expires, you need to get a new one via `/login`
+- when using `/refresh` and `/logout`, the request body must contain the `refresh_token` field with the `Bearer` prefix
+  (json example: `{"refresh_token": "Bearer <refresh_token>"}`)
 - the `/logout` refresh token will be deleted from the database, therefore, use `/login` to receive a new refresh token
+
 
 **Note:** more details are described in swagger
 
