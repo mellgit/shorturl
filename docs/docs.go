@@ -30,7 +30,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "Protected",
                 "responses": {
@@ -74,7 +74,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "RedirectHandler get token",
+                "description": "Get original link without redirect",
                 "consumes": [
                     "application/json"
                 ],
@@ -82,7 +82,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Redirect"
                 ],
                 "summary": "RedirectHandler",
                 "parameters": [
@@ -137,7 +137,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "ShortenHandler",
                 "parameters": [
@@ -194,7 +194,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "List",
                 "responses": {
@@ -243,7 +243,7 @@ const docTemplate = `{
                     "image/png"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "GenerateQRCode",
                 "parameters": [
@@ -301,7 +301,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "DeleteUrl",
                 "parameters": [
@@ -354,7 +354,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "UpdateAlias",
                 "parameters": [
@@ -418,7 +418,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "Stats",
                 "parameters": [
@@ -460,7 +460,7 @@ const docTemplate = `{
         },
         "/auth/login": {
             "post": {
-                "description": "Login user",
+                "description": "Get access and refresh tokens",
                 "consumes": [
                     "application/json"
                 ],
@@ -468,7 +468,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "Login",
                 "parameters": [
@@ -512,7 +512,7 @@ const docTemplate = `{
         },
         "/auth/logout": {
             "post": {
-                "description": "Logout user",
+                "description": "Delete user refresh token",
                 "consumes": [
                     "application/json"
                 ],
@@ -520,7 +520,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "Logout",
                 "parameters": [
@@ -572,7 +572,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "RefreshToken",
                 "parameters": [
@@ -624,7 +624,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "Register",
                 "parameters": [
