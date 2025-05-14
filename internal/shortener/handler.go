@@ -31,7 +31,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 // @Summary      ShortenHandler
 // @Description  ShortenHandler create alias
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Shortener
 // @Accept       json
 // @Produce      json
 // @Param 		 request body ShortenRequest true "body"
@@ -77,7 +77,7 @@ func (h *Handler) ShortenHandler(ctx *fiber.Ctx) error {
 // @Summary      Protected
 // @Description  Protected check authorized user
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Shortener
 // @Accept       json
 // @Produce      json
 // @Success      200 {object} MessageResponse
@@ -94,7 +94,7 @@ func (h *Handler) Protected(ctx *fiber.Ctx) error {
 // @Summary      Stats
 // @Description  Stats for clicks on url
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Shortener
 // @Accept       json
 // @Produce      json
 // @Param        alias path string true "alias"
@@ -121,7 +121,7 @@ func (h *Handler) Stats(ctx *fiber.Ctx) error {
 // @Summary      List
 // @Description  List
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Shortener
 // @Accept       json
 // @Produce      json
 // @Success      200 {array} URL
@@ -146,7 +146,7 @@ func (h *Handler) List(ctx *fiber.Ctx) error {
 // @Summary      DeleteUrl
 // @Description  DeleteUrl
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Shortener
 // @Accept       json
 // @Produce      json
 // @Param        alias path string true "alias"
@@ -172,7 +172,7 @@ func (h *Handler) DeleteUrl(ctx *fiber.Ctx) error {
 // @Summary      UpdateAlias
 // @Description  UpdateAlias update only alias
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Shortener
 // @Accept       json
 // @Produce      json
 // @Param        alias path string true "alias"
@@ -208,7 +208,7 @@ func (h *Handler) UpdateAlias(ctx *fiber.Ctx) error {
 // @Summary      GenerateQRCode
 // @Description  GenerateQRCode
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Shortener
 // @Accept       json
 // @Produce      png
 // @Param        alias path string true "alias"

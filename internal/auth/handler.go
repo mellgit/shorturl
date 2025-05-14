@@ -25,7 +25,7 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 // RefreshToken
 // @Summary      RefreshToken
 // @Description  RefreshToken
-// @Tags         ShortUrl
+// @Tags         Authentication
 // @Accept       json
 // @Produce      json
 // @Param 		 request body RefreshTokenRequest true "body"
@@ -59,8 +59,8 @@ func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
 
 // Login
 // @Summary      Login
-// @Description  Login user
-// @Tags         ShortUrl
+// @Description  Get access and refresh tokens
+// @Tags         Authentication
 // @Accept       json
 // @Produce      json
 // @Param 		 request body LoginRequest true "body"
@@ -95,7 +95,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 // Register
 // @Summary      Register
 // @Description  Register new user
-// @Tags         ShortUrl
+// @Tags         Authentication
 // @Accept       json
 // @Produce      json
 // @Param 		 request body RegisterRequest true "body"
@@ -128,8 +128,8 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 
 // Logout
 // @Summary      Logout
-// @Description  Logout user
-// @Tags         ShortUrl
+// @Description  Delete user refresh token
+// @Tags         Authentication
 // @Accept       json
 // @Produce      json
 // @Param 		 request body LogoutRequest true "body"

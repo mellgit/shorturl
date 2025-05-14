@@ -22,7 +22,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "Protected",
                 "responses": {
@@ -66,7 +66,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "RedirectHandler get token",
+                "description": "Get original link without redirect",
                 "consumes": [
                     "application/json"
                 ],
@@ -74,7 +74,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Redirect"
                 ],
                 "summary": "RedirectHandler",
                 "parameters": [
@@ -129,7 +129,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "ShortenHandler",
                 "parameters": [
@@ -186,7 +186,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "List",
                 "responses": {
@@ -235,7 +235,7 @@
                     "image/png"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "GenerateQRCode",
                 "parameters": [
@@ -293,7 +293,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "DeleteUrl",
                 "parameters": [
@@ -346,7 +346,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "UpdateAlias",
                 "parameters": [
@@ -410,7 +410,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Shortener"
                 ],
                 "summary": "Stats",
                 "parameters": [
@@ -452,7 +452,7 @@
         },
         "/auth/login": {
             "post": {
-                "description": "Login user",
+                "description": "Get access and refresh tokens",
                 "consumes": [
                     "application/json"
                 ],
@@ -460,7 +460,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "Login",
                 "parameters": [
@@ -504,7 +504,7 @@
         },
         "/auth/logout": {
             "post": {
-                "description": "Logout user",
+                "description": "Delete user refresh token",
                 "consumes": [
                     "application/json"
                 ],
@@ -512,7 +512,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "Logout",
                 "parameters": [
@@ -564,7 +564,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "RefreshToken",
                 "parameters": [
@@ -616,7 +616,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ShortUrl"
+                    "Authentication"
                 ],
                 "summary": "Register",
                 "parameters": [

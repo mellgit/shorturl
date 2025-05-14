@@ -159,12 +159,12 @@ paths:
       - ApiKeyAuth: []
       summary: Protected
       tags:
-      - ShortUrl
+      - Shortener
   /api/s/{alias}:
     get:
       consumes:
       - application/json
-      description: RedirectHandler get token
+      description: Get original link without redirect
       parameters:
       - description: alias
         in: path
@@ -194,7 +194,7 @@ paths:
       - ApiKeyAuth: []
       summary: RedirectHandler
       tags:
-      - ShortUrl
+      - Redirect
   /api/shorten:
     post:
       consumes:
@@ -230,7 +230,7 @@ paths:
       - ApiKeyAuth: []
       summary: ShortenHandler
       tags:
-      - ShortUrl
+      - Shortener
   /api/shorten/{alias}:
     delete:
       consumes:
@@ -265,7 +265,7 @@ paths:
       - ApiKeyAuth: []
       summary: DeleteUrl
       tags:
-      - ShortUrl
+      - Shortener
     patch:
       consumes:
       - application/json
@@ -305,7 +305,7 @@ paths:
       - ApiKeyAuth: []
       summary: UpdateAlias
       tags:
-      - ShortUrl
+      - Shortener
   /api/shorten/list:
     get:
       consumes:
@@ -336,7 +336,7 @@ paths:
       - ApiKeyAuth: []
       summary: List
       tags:
-      - ShortUrl
+      - Shortener
   /api/shorten/qrcode/{alias}:
     get:
       consumes:
@@ -373,7 +373,7 @@ paths:
       - ApiKeyAuth: []
       summary: GenerateQRCode
       tags:
-      - ShortUrl
+      - Shortener
   /api/stats/{alias}:
     get:
       consumes:
@@ -408,12 +408,12 @@ paths:
       - ApiKeyAuth: []
       summary: Stats
       tags:
-      - ShortUrl
+      - Shortener
   /auth/login:
     post:
       consumes:
       - application/json
-      description: Login user
+      description: Get access and refresh tokens
       parameters:
       - description: body
         in: body
@@ -442,12 +442,12 @@ paths:
             $ref: '#/definitions/auth.ErrorResponse'
       summary: Login
       tags:
-      - ShortUrl
+      - Authentication
   /auth/logout:
     post:
       consumes:
       - application/json
-      description: Logout user
+      description: Delete user refresh token
       parameters:
       - description: body
         in: body
@@ -476,7 +476,7 @@ paths:
             $ref: '#/definitions/auth.ErrorResponse'
       summary: Logout
       tags:
-      - ShortUrl
+      - Authentication
   /auth/refresh:
     post:
       consumes:
@@ -510,7 +510,7 @@ paths:
             $ref: '#/definitions/auth.ErrorResponse'
       summary: RefreshToken
       tags:
-      - ShortUrl
+      - Authentication
   /auth/register/:
     post:
       consumes:
@@ -544,7 +544,7 @@ paths:
             $ref: '#/definitions/auth.ErrorResponse'
       summary: Register
       tags:
-      - ShortUrl
+      - Authentication
 securityDefinitions:
   ApiKeyAuth:
     in: header

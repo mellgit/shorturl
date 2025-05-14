@@ -22,9 +22,9 @@ func (h *Handler) GroupHandler(app *fiber.App) {
 
 // RedirectHandler
 // @Summary      RedirectHandler
-// @Description  RedirectHandler get token
+// @Description  Get original link without redirect
 // @Security ApiKeyAuth
-// @Tags         ShortUrl
+// @Tags         Redirect
 // @Accept       json
 // @Produce      json
 // @Param        alias path string true "alias"
